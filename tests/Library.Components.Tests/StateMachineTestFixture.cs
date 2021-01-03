@@ -1,3 +1,5 @@
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+
 namespace Library.Components.Tests
 {
     using System;
@@ -39,6 +41,8 @@ namespace Library.Components.Tests
                     cfg.AddPublishMessageScheduler();
 
                     cfg.AddSagaStateMachineTestHarness<TStateMachine, TInstance>();
+                    
+                    ConfigureMassTransit(cfg);
                 });
 
             ConfigureServices(collection);
@@ -59,6 +63,10 @@ namespace Library.Components.Tests
             Machine = Provider.GetRequiredService<TStateMachine>();
         }
 
+        protected virtual void ConfigureMassTransit(IServiceCollectionBusConfigurator busConfigurator)
+        {
+            
+        }
         protected virtual void ConfigureServices(IServiceCollection collection)
         {
         }

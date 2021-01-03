@@ -1,3 +1,5 @@
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+
 namespace Library.Components.Tests
 {
     using System.Threading.Tasks;

@@ -9,9 +9,8 @@ namespace Library.Components.StateMachines
         SagaStateMachineInstance
     {
         public int CurrentState { get; set; }
-
         public DateTime DateAdded { get; set; }
-
+        
         public string Title { get; set; }
         public string Isbn { get; set; }
 
