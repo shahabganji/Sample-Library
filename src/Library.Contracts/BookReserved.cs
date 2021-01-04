@@ -2,7 +2,7 @@ using System;
 
 namespace Library.Contracts
 {
-    public interface ReservationRequested
+    public interface BookReserved
     {
         Guid ReservationId { get; }
         DateTime Timestamp { get; }

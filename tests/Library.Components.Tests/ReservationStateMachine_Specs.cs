@@ -102,4 +102,68 @@ namespace Library.Components.Tests
         }
     }
     
+        public class When_reservation_expired :
+        StateMachineTestFixture<ReservationStateMachine, Reservation>
+    {
+        private IStateMachineSagaTestHarness<Book, BookStateMachine> BookSagaHarness;
+        private BookStateMachine BookMachine;
+
+        [Test]
+        public async Task Should_mark_the_book_as_available()
+        {
+            var bookId = NewId.NextGuid();
+            var reservationId = NewId.NextGuid();
+            var memberId = NewId.NextGuid();
+            
+            await TestHarness.Bus.Publish<BookAdded>(new
+            {
+                BookId = bookId,
+                Isbn = "0307969959",
+                Title = "Neuromancer"
+            });
+            
+            var bookExistsId = await BookSagaHarness.Exists(bookId, x => x.Available);
+            Assert.IsTrue(bookExistsId.HasValue, "Book did not exist");
+            
+            await TestHarness.Bus.Publish<ReservationRequested>(new
+            {
+                InVar.Timestamp ,
+                ReservationId = reservationId,
+                MemberId = memberId,
+                BookId = bookId
+            });
+
+            var reservation = await SagaHarness.Exists(reservationId, x => x.Reserved);
+            Assert.IsNotNull(reservation , "Reservation was not reserved");
+            bookExistsId = await BookSagaHarness.Exists(bookId, x => x.Reserved);
+            Assert.IsTrue(bookExistsId.HasValue, "Book was not reserved");
+
+            await AdvanceSystemTime(TimeSpan.FromHours(24));
+
+            var notExists = await SagaHarness.NotExists(reservationId);
+            Assert.IsFalse(notExists.HasValue);
+            
+            bookExistsId = await BookSagaHarness.Exists(bookId, x => x.Available);
+            Assert.IsTrue(bookExistsId.HasValue, "Book was not available after reservation expired");
+        }
+
+        [OneTimeSetUp]
+        public void TestSetup()
+        {
+            BookSagaHarness = Provider.GetRequiredService<IStateMachineSagaTestHarness<Book, BookStateMachine>>();
+            BookMachine = Provider.GetRequiredService<BookStateMachine>();
+        }
+
+        protected override void ConfigureMassTransit(IServiceCollectionBusConfigurator busConfigurator)
+        {
+            busConfigurator.AddSagaStateMachine<BookStateMachine, Book>()
+                .InMemoryRepository();
+
+            busConfigurator.AddPublishMessageScheduler();
+
+            busConfigurator.AddSagaStateMachineTestHarness<BookStateMachine, Book>();
+        }
+    }
+
+    
 }

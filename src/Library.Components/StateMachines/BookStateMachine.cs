@@ -30,20 +30,26 @@ namespace Library.Components.StateMachines
             During(Available,
                 When(ReservationRequested)
                     .Then(context => { })
-                    .TransitionTo(Reserved)
                     .PublishAsync(context => context.Init<BookReserved>(new
                     {
                         // this is different than the timestamp of the requested event
                         InVar.Timestamp,
-                        
+
                         context.Data.ReservationId,
                         context.Data.MemberId,
                         context.Data.BookId
-                    }))); 
+                    }))
+                    .TransitionTo(Reserved)
+                );
+
+            During(Reserved,
+                When(BookReservationCanceled)
+                    .TransitionTo(Available));
         }
 
         public Event<BookAdded> Added { get; }
         public Event<ReservationRequested> ReservationRequested { get; }
+        public Event<BookReservationCanceled> BookReservationCanceled { get; }
 
         public State Available { get; }
         public State Reserved { get; }

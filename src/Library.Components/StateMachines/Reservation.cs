@@ -15,5 +15,10 @@ namespace Library.Components.StateMachines
         public Guid BookId { get; set; }
         
         public Guid CorrelationId { get; set; }
+
+        /// <summary>
+        /// We will store the scheduled reservation token in here
+        /// </summary>
+        public Guid? ExpirationTokenId { get; set; }
     }
 }
