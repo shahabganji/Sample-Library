@@ -2,9 +2,9 @@ using System;
 
 namespace Library.Contracts
 {
-    public interface BookReservationCanceled
+    public interface ReservationCancellationRequested
     {
         Guid ReservationId { get; }
-        Guid BookId { get; }
+        DateTime Timestamp { get; }
     }
 }
